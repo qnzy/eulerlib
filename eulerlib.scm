@@ -45,7 +45,6 @@
   (prime-factors-aux n (primes-to (inexact->exact (ceiling (sqrt n)))) '()))
 
 ; return n-th Fibonacci number (1 1 2 3 5 8 ...)
-; return the prime factors of n
 (define (fib n)
   (if (< n 3)
     1
@@ -88,14 +87,6 @@
 (define (leap-year? y)
   (and (zero? (modulo y 4)) (or (not (zero? (modulo y 100))) (zero? (modulo y 400)))))
 
-; generate all palindromes width d or fewer digits
-; TODO: does not generate odd length palindromes yet
-(define (gen-palindromes n) 
-  (map string->number
-       (append '("1" "2" "3" "4" "5" "6" "7" "8" "9") 
-               (map (lambda (x) (string-append x (string-reverse x))) 
-                    (map number->string (iota (inexact->exact n) 1))))))
-
 ; log to base 10
 (define (log10 x)
   (/ (log x) (log 10)))
@@ -106,13 +97,13 @@
 
 ; check if n is a lychrel number
 ; (if repeatedly adding it to its mirror
-; does not produce a palindrome)
-(define (lychrel? n)
+; does not produce a palindrome, try lim times)
+(define (lychrel? n lim)
   (define (transform  n)
     (+ n (string->number (string-reverse (number->string n)))))
   (define  (lychrel?-aux n i) 
     (if (palindrome? n) #f 
-      (if (<= i 50) (lychrel?-aux (transform n) (+ i 1)) #t)))
+      (if (<= i lim) (lychrel?-aux (transform n) (+ i 1)) #t)))
   (lychrel?-aux (transform n) 1))
 
 ; find numbers n where (fun n) is true; start
