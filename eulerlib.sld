@@ -1,7 +1,17 @@
 ; some function for projecteuler problems
 ; don't forget lcm, gcd
 
-(require-extension numbers srfi-1)
+(define-library (eulerlib)
+
+ (export prime? primes-to nth-prime prime-factors fib palindrome? 
+  divisible-by-all triangle triangle? pentagonal pentagonal?
+  hexagonal hexagonal? leap-year? log10 repunit lychrel? find-where)
+
+ (import (scheme base)
+         (scheme inexact)
+         (srfi 1))
+
+ (begin
 
 ; check for prime, simple version
 ; test:
@@ -11,14 +21,14 @@
     ((< n 2) #f)
     ((= n 2) #t)
     (else (not (any (lambda (x) (= 0 (modulo n x)))
-                    (cons 2 (iota (inexact->exact (floor (/ (sqrt n) 2))) 3 2)))))))
+                    (cons 2 (iota (exact (floor (/ (sqrt n) 2))) 3 2)))))))
 
 ; return primes up to n (inclusive)
 (define (primes-to n)
   (if (< n 2)
     '()
     (filter prime? 
-            (cons 2 (iota (inexact->exact (ceiling (/ n 2))) 1 2)))))
+            (cons 2 (iota (exact (ceiling (/ n 2))) 1 2)))))
 
 ; returns n-th prime
 (define (nth-prime n)
@@ -42,7 +52,7 @@
           (let ((n-divided (quotient n candidate)))
             (prime-factors-aux n-divided (filter (lambda (x) (<= x (sqrt n-divided))) primes-to-test) (cons candidate factors)))
           (prime-factors-aux n rest-of-primes factors)))))
-  (prime-factors-aux n (primes-to (inexact->exact (ceiling (sqrt n)))) '()))
+  (prime-factors-aux n (primes-to (exact (ceiling (sqrt n)))) '()))
 
 ; return n-th Fibonacci number (1 1 2 3 5 8 ...)
 (define (fib n)
@@ -91,7 +101,7 @@
 (define (log10 x)
   (/ (log x) (log 10)))
 
-; define a repunit (repeating 1) of length n)
+; define a repunit (repeating 1) of length n
 (define (repunit n)
  (/ (- (expt 10 n) 1) 9))
 
@@ -100,7 +110,8 @@
 ; does not produce a palindrome, try lim times)
 (define (lychrel? n lim)
   (define (transform  n)
-    (+ n (string->number (string-reverse (number->string n)))))
+    ;(+ n (string->number (string-reverse (number->string n)))))
+    (+ n (string->number (list->string (reverse (string->list (number->string n)))))))
   (define  (lychrel?-aux n i) 
     (if (palindrome? n) #f 
       (if (<= i lim) (lychrel?-aux (transform n) (+ i 1)) #t)))
@@ -119,3 +130,5 @@
         (find-where-aux fun (+ n 1) nsols lst))))
   (find-where-aux fun nstart nsols '()))
 
+) ; begin
+) ; define-library
